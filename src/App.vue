@@ -279,15 +279,10 @@ onMounted(() => {
 <template>
   <div class="container">
     <div class="title-section">
-      <h1>图像质量诊断报告</h1>
-      <a href="https://km.sankuai.com/collabpage/2693732140" 
-         target="_blank" 
-         class="help-icon"
-         @mouseenter="showHelpTooltip = true"
-         @mouseleave="showHelpTooltip = false">
-        <span class="icon">!</span>
-        <div class="tooltip" v-if="showHelpTooltip">报告解释说明</div>
-      </a>
+      <h1>图像质量诊断报告
+        <span class="help-icon" @click="showHelpTooltip = true">❓</span>
+      </h1>
+      <div class="tooltip" v-if="showHelpTooltip">报告解释说明</div>
     </div>
     <div class="diagnosis-section">
       <div class="section-header">
@@ -297,7 +292,10 @@ onMounted(() => {
           下载明细结果
         </button>
       </div>
-      <p class="diagnosis-summary">本次共诊断了<span>{{ totalImages }}</span>张图片</p>
+      <div class="diagnosis-summary">
+        本次共诊断了{{ totalImages }}张图片
+        <span class="help-icon" title="本次调用了手持误拍识别、手机截图识别、拼接图检测、白底图识别、变形图识别、黑白边识别、卖点贴识别、重复图识别、包装图检测、背标图检测、二维码/条形码检测、商品质量异常检测、角度旋转检测、光线图识别、水印识别的服务，低质图片类型如下所示。">!</span>
+      </div>
       
       <div class="image-types">
         <div 
@@ -429,43 +427,40 @@ h2 {
 }
 
 .help-icon {
-  position: absolute;
-  right: -24px;
-  top: 4px;
+  display: inline-block;
   width: 16px;
   height: 16px;
+  line-height: 16px;
+  text-align: center;
   border-radius: 50%;
-  background-color: #e9ecef;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  transition: all 0.2s;
-}
-
-.help-icon .icon {
-  color: #666;
+  background-color: #e6f7ff;
+  color: #1890ff;
+  margin-left: 8px;
+  cursor: help;
   font-size: 12px;
-  font-weight: bold;
   font-style: normal;
+  border: 1px solid #91d5ff;
 }
 
 .help-icon:hover {
-  background-color: #dee2e6;
+  background-color: #1890ff;
+  color: white;
+  border-color: #1890ff;
 }
 
 .help-icon .tooltip {
   position: absolute;
-  top: -30px;
+  bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
+  padding: 8px 12px;
   background-color: rgba(0, 0, 0, 0.8);
   color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
   font-size: 12px;
+  border-radius: 4px;
   white-space: nowrap;
-  pointer-events: none;
+  margin-bottom: 8px;
+  z-index: 1000;
 }
 
 .help-icon .tooltip::after {
@@ -474,9 +469,13 @@ h2 {
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  border-width: 4px;
+  border-width: 5px;
   border-style: solid;
   border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+}
+
+.help-icon:hover .tooltip {
+  visibility: visible;
 }
 
 .diagnosis-section, .services-section {
@@ -488,14 +487,34 @@ h2 {
 }
 
 .diagnosis-summary {
+  font-size: 14px;
   color: #666;
-  margin-bottom: 25px;
-  font-size: 16px;
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
 }
 
-.diagnosis-summary span {
-  color: #007bff;
-  font-weight: bold;
+.help-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #e6f7ff;
+  color: #1890ff;
+  margin-left: 8px;
+  cursor: help;
+  font-size: 12px;
+  font-style: normal;
+  border: 1px solid #91d5ff;
+  transition: all 0.3s;
+}
+
+.help-icon:hover {
+  background-color: #1890ff;
+  color: white;
+  border-color: #1890ff;
 }
 
 .image-types {
