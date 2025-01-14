@@ -3,7 +3,7 @@ import { ref, onMounted, computed } from 'vue'
 import Chart from 'chart.js/auto'
 import { ElMessage } from 'element-plus'
 
-const totalImages = ref(20)
+const totalImages = ref(200)
 const showPreview = ref(false)
 const selectedType = ref(null)
 const selectedServices = ref([])
@@ -22,71 +22,89 @@ const formData = ref({
 const imageTypes = [
   { 
     name: '黑白边', 
-    count: 5, 
+    count: 50, 
     percentage: 25,
     service: '黑白边识别',
-    examples: [
-      { url: '/examples/black-border-1.jpg', description: '商品图片四周出现黑边' },
-      { url: '/examples/black-border-2.jpg', description: '局部区域出现黑边' },
-      { url: '/examples/black-border-3.jpg', description: '图片边缘出现白边' },
-      { url: '/examples/black-border-4.jpg', description: '图片周围有明显边框' },
-      { url: '/examples/black-border-5.jpg', description: '不规则黑白边' }
-    ]
+    examples: Array(50).fill(null).map((_, index) => ({
+      url: ['/examples/black-border-1.jpg', '/examples/black-border-2.jpg', '/examples/black-border-3.jpg', '/examples/black-border-4.jpg', '/examples/black-border-5.jpg'][index % 5],
+      description: [
+        '商品图片四周出现黑边',
+        '局部区域出现黑边',
+        '图片边缘出现白边',
+        '图片周围有明显边框',
+        '不规则黑白边'
+      ][index % 5]
+    }))
   },
   { 
     name: '重复图片', 
-    count: 4, 
+    count: 40, 
     percentage: 20,
     service: '重复图识别',
-    examples: [
-      { url: '/examples/duplicate-1.jpg', description: '同一商品重复上传' },
-      { url: '/examples/duplicate-2.jpg', description: '相似角度重复拍摄' },
-      { url: '/examples/duplicate-3.jpg', description: '不同光线重复拍摄' },
-      { url: '/examples/duplicate-4.jpg', description: '细节图重复使用' }
-    ]
+    examples: Array(40).fill(null).map((_, index) => ({
+      url: ['/examples/duplicate-1.jpg', '/examples/duplicate-2.jpg', '/examples/duplicate-3.jpg', '/examples/duplicate-4.jpg'][index % 4],
+      description: [
+        '同一商品重复上传',
+        '相似角度重复拍摄',
+        '不同光线重复拍摄',
+        '细节图重复使用'
+      ][index % 4]
+    }))
   },
   { 
     name: '水印图片', 
-    count: 3, 
+    count: 30, 
     percentage: 15,
     service: '水印识别',
-    examples: [
-      { url: '/examples/watermark-1.jpg', description: '图片包含水印标记' },
-      { url: '/examples/watermark-2.jpg', description: '图片包含透明水印' },
-      { url: '/examples/watermark-3.jpg', description: '图片包含品牌水印' }
-    ]
+    examples: Array(30).fill(null).map((_, index) => ({
+      url: ['/examples/watermark-1.jpg', '/examples/watermark-2.jpg', '/examples/watermark-3.jpg'][index % 3],
+      description: [
+        '图片包含水印标记',
+        '图片包含透明水印',
+        '图片包含品牌水印'
+      ][index % 3]
+    }))
   },
   { 
     name: '拼接图片', 
-    count: 3, 
+    count: 30, 
     percentage: 15,
     service: '拼接图检测',
-    examples: [
-      { url: '/examples/composite-1.jpg', description: '多张图片拼接上传' },
-      { url: '/examples/composite-2.jpg', description: '商品细节拼接展示' },
-      { url: '/examples/composite-3.jpg', description: '不同角度拼接展示' }
-    ]
+    examples: Array(30).fill(null).map((_, index) => ({
+      url: ['/examples/composite-1.jpg', '/examples/composite-2.jpg', '/examples/composite-3.jpg'][index % 3],
+      description: [
+        '多张图片拼接上传',
+        '商品细节拼接展示',
+        '不同角度拼接展示'
+      ][index % 3]
+    }))
   },
   { 
     name: '手机截图', 
-    count: 3, 
+    count: 30, 
     percentage: 15,
     service: '手机截图识别',
-    examples: [
-      { url: '/examples/screenshot-1.jpg', description: '手机界面截图上传' },
-      { url: '/examples/screenshot-2.jpg', description: '包含状态栏的截图' },
-      { url: '/examples/screenshot-3.jpg', description: '应用内截图上传' }
-    ]
+    examples: Array(30).fill(null).map((_, index) => ({
+      url: ['/examples/screenshot-1.jpg', '/examples/screenshot-2.jpg', '/examples/screenshot-3.jpg'][index % 3],
+      description: [
+        '手机界面截图上传',
+        '包含状态栏的截图',
+        '应用内截图上传'
+      ][index % 3]
+    }))
   },
   { 
     name: '误拍图片', 
-    count: 2, 
+    count: 20, 
     percentage: 10,
     service: '手持误拍识别',
-    examples: [
-      { url: '/examples/misshot-1.jpg', description: '图片模糊或失焦' },
-      { url: '/examples/misshot-2.jpg', description: '拍摄角度不当' }
-    ]
+    examples: Array(20).fill(null).map((_, index) => ({
+      url: ['/examples/misshot-1.jpg', '/examples/misshot-2.jpg'][index % 2],
+      description: [
+        '图片模糊或失焦',
+        '拍摄角度不当'
+      ][index % 2]
+    }))
   }
 ]
 
@@ -182,21 +200,21 @@ const formItems = [
     key: 'businessContact',
     type: 'select',
     required: true,
-    placeholder: '请输入并进行选择'
+    placeholder: '请输入业务对接人'
   },
   {
     label: '业务对接组',
     key: 'businessGroup',
     type: 'select',
     required: true,
-    placeholder: '请输入并进行选择'
+    placeholder: '请输入业务对接组'
   },
   {
     label: '关联需求',
     key: 'relatedDemand',
     type: 'select',
     required: false,
-    placeholder: '请输入并搜索ones需求'
+    placeholder: '请输入关联需求'
   },
   {
     label: '素材类型',
@@ -266,6 +284,138 @@ const handleSubmit = () => {
   })
 }
 
+const imageIssuesData = ref([
+  { 
+    id: 1, 
+    count: 15, 
+    thumbnail: '/examples/black-border-1.jpg', 
+    issues: [
+      '黑白边',
+      '水印图片',
+      '拼接图片',
+      '重复图片',
+      '手机截图',
+      '误拍图片',
+      '黑白边-左侧',
+      '黑白边-右侧',
+      '水印-左上角',
+      '水印-右下角',
+      '拼接-横向',
+      '拼接-纵向',
+      '重复-相似角度',
+      '重复-不同光线',
+      '模糊'
+    ]
+  },
+  { 
+    id: 2, 
+    count: 12, 
+    thumbnail: '/examples/watermark-2.jpg', 
+    issues: [
+      '水印图片',
+      '重复图片',
+      '手机截图',
+      '水印-中心',
+      '水印-四角',
+      '水印-半透明',
+      '重复-正面',
+      '重复-侧面',
+      '截图-状态栏',
+      '截图-导航栏',
+      '截图-应用内',
+      '模糊'
+    ]
+  },
+  { 
+    id: 3, 
+    count: 10, 
+    thumbnail: '/examples/composite-2.jpg', 
+    issues: [
+      '拼接图片',
+      '水印图片',
+      '重复图片',
+      '拼接-多张',
+      '拼接-不规则',
+      '水印-品牌',
+      '水印-文字',
+      '重复-细节',
+      '重复-场景',
+      '模糊'
+    ]
+  },
+  { 
+    id: 4, 
+    count: 8, 
+    thumbnail: '/examples/screenshot-2.jpg', 
+    issues: [
+      '手机截图',
+      '水印图片',
+      '截图-全屏',
+      '截图-局部',
+      '水印-角落',
+      '水印-中央',
+      '模糊',
+      '变形'
+    ]
+  },
+  { 
+    id: 5, 
+    count: 6, 
+    thumbnail: '/examples/misshot-1.jpg', 
+    issues: [
+      '误拍图片',
+      '重复图片',
+      '模糊',
+      '光线不足',
+      '角度不当',
+      '手抖'
+    ]
+  },
+  { 
+    id: 6, 
+    count: 4, 
+    thumbnail: '/examples/black-border-2.jpg', 
+    issues: [
+      '黑白边',
+      '黑白边-上方',
+      '黑白边-下方',
+      '变形'
+    ]
+  },
+  { 
+    id: 7, 
+    count: 3, 
+    thumbnail: '/examples/composite-1.jpg', 
+    issues: [
+      '拼接图片',
+      '拼接-横向',
+      '拼接-不对齐'
+    ]
+  },
+  { 
+    id: 8, 
+    count: 2, 
+    thumbnail: '/examples/screenshot-1.jpg', 
+    issues: [
+      '手机截图',
+      '截图-状态栏'
+    ]
+  }
+])
+
+const selectedIssueImage = ref(null)
+const showIssueDetail = ref(false)
+
+const openIssueDetail = (image) => {
+  selectedIssueImage.value = image
+  showIssueDetail.value = true
+}
+
+const closeIssueDetail = () => {
+  showIssueDetail.value = false
+  selectedIssueImage.value = null
+}
+
 onMounted(() => {
   const ctx = document.getElementById('qualityChart')
   new Chart(ctx, {
@@ -293,6 +443,18 @@ onMounted(() => {
       plugins: {
         legend: {
           display: false
+        },
+        title: {
+          display: true,
+          text: '低质类型分布',
+          font: {
+            size: 16,
+            weight: 'normal'
+          },
+          padding: {
+            top: 10,
+            bottom: 20
+          }
         },
         tooltip: {
           callbacks: {
@@ -327,9 +489,9 @@ onMounted(() => {
       scales: {
         y: {
           beginAtZero: true,
-          max: 5,
+          max: 50,
           ticks: {
-            stepSize: 1,
+            stepSize: 10,
             callback: function(value) {
               return value + '张';
             },
@@ -364,6 +526,93 @@ onMounted(() => {
           right: 10,
           top: 10,
           bottom: 10
+        }
+      },
+      onClick: (event, elements) => {
+        if (elements.length > 0) {
+          const index = elements[0].index;
+          const type = imageTypes[index];
+          openPreview(type);
+        }
+      }
+    }
+  })
+
+  // 添加图片质量问题分布图表
+  const issuesCtx = document.getElementById('issuesDistributionChart')
+  new Chart(issuesCtx, {
+    type: 'bar',
+    data: {
+      labels: imageIssuesData.value.map(img => `图片${img.id}`),
+      datasets: [{
+        label: '低质问题数量',
+        data: imageIssuesData.value.map(img => img.count),
+        backgroundColor: 'rgba(100, 180, 255, 0.6)',
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      onClick: (event, elements) => {
+        if (elements.length > 0) {
+          const index = elements[0].index;
+          const image = imageIssuesData.value[index];
+          openIssueDetail(image);
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 15,
+          min: 0,
+          ticks: {
+            stepSize: 3,
+            callback: function(value) {
+              return value + '个';
+            }
+          },
+          title: {
+            display: true,
+            text: '低质问题数量'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: '图片编号'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        title: {
+          display: true,
+          text: '图片低质问题数量',
+          font: {
+            size: 16,
+            weight: 'normal'
+          },
+          padding: {
+            top: 10,
+            bottom: 20
+          }
+        },
+        tooltip: {
+          callbacks: {
+            title: function(tooltipItems) {
+              return `图片${tooltipItems[0].dataIndex + 1}`;
+            },
+            label: function(context) {
+              const image = imageIssuesData.value[context.dataIndex]
+              return [
+                `问题数量: ${image.count}个`,
+                `存在问题: ${image.issues.join('、')}`
+              ]
+            }
+          }
         }
       }
     }
@@ -413,8 +662,15 @@ onMounted(() => {
         </div>
       </div>
 
-      <div class="chart-container" style="width: 80%; height: 300px; margin: 20px auto;">
-        <canvas id="qualityChart"></canvas>
+      <div class="chart-section">
+        <div class="chart-container quality-distribution">
+          <canvas id="qualityChart"></canvas>
+        </div>
+        
+        <!-- 添加新的图表容器 -->
+        <div class="chart-container issues-distribution">
+          <canvas id="issuesDistributionChart"></canvas>
+        </div>
       </div>
     </div>
 
@@ -437,21 +693,21 @@ onMounted(() => {
     </div>
 
     <!-- 图片预览弹窗 -->
-    <div v-if="showPreview" class="modal-overlay" @click="closePreview">
-      <div class="modal-content" @click.stop>
-        <div class="modal-header">
-          <h3>{{ selectedType?.name }} - 示例</h3>
-          <button class="close-button" @click="closePreview">&times;</button>
-        </div>
-        <div class="modal-body">
+    <div v-if="showPreview" class="modal-overlay" @click.self="closePreview">
+      <div class="modal-content preview-modal">
+        <button class="close-button" @click="closePreview">×</button>
+        <div class="preview-content">
+          <h2>{{selectedType.name}} - 示例</h2>
           <div class="examples-grid">
-            <div v-for="(example, index) in selectedType?.examples" 
-                 :key="index" 
+            <div v-for="example in selectedType.examples" 
+                 :key="example.url" 
                  class="example-item">
               <div class="example-image">
-                <img :src="example.url">
+                <img :src="example.url" :alt="example.description">
               </div>
-              <p class="example-description">{{ example.description }}</p>
+              <div class="example-description">
+                {{example.description}}
+              </div>
             </div>
           </div>
         </div>
@@ -551,6 +807,36 @@ onMounted(() => {
       <div class="success-content">
         <div class="success-icon">✓</div>
         <div class="success-message">创建成功，请到玉树-控制台-场景管理查看</div>
+      </div>
+    </div>
+
+    <!-- 图片问题详情弹窗 -->
+    <div v-if="showIssueDetail" class="modal-overlay" @click.self="closeIssueDetail">
+      <div class="modal-content issue-detail-modal">
+        <button class="close-button" @click="closeIssueDetail">×</button>
+        <div class="issue-detail-content">
+          <!-- 上部分：图片展示 -->
+          <div class="issue-image-section">
+            <img :src="selectedIssueImage?.thumbnail" alt="问题图片">
+            <div class="image-info">
+              <h3>图片 {{selectedIssueImage?.id}}</h3>
+              <div class="issue-count">发现 {{selectedIssueImage?.count}} 个问题</div>
+            </div>
+          </div>
+          <!-- 下部分：问题列表 -->
+          <div class="issue-list-section">
+            <div class="issue-list-header">存在的问题：</div>
+            <div class="issues-scroll">
+              <div class="issues-row">
+                <div v-for="issue in selectedIssueImage?.issues" 
+                     :key="issue" 
+                     class="issue-tag">
+                  {{issue}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1164,5 +1450,222 @@ input:disabled {
 
 .select-input span {
   text-align: left;
+}
+
+.chart-section {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-top: 30px;
+  align-items: center;  /* 居中对齐 */
+}
+
+.chart-container {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  height: 400px;  /* 设置固定高度 */
+  width: 80%;  /* 设置为父容器的80%宽度 */
+  max-width: 800px;  /* 设置最大宽度 */
+}
+
+.quality-distribution,
+.issues-distribution {
+  position: relative;
+}
+
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.issue-detail-modal {
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.issue-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.issue-image-section {
+  position: relative;
+  width: 100%;
+  background: #f8f9fa;
+}
+
+.issue-image-section img {
+  width: 100%;
+  height: 400px;
+  object-fit: contain;
+  display: block;
+}
+
+.image-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  color: white;
+}
+
+.image-info h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.issue-count {
+  margin-top: 4px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.issue-list-section {
+  padding: 24px;
+}
+
+.issue-list-header {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.issues-scroll {
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.issues-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px;
+}
+
+.issue-tag {
+  background: #f0f2f5;
+  border-radius: 4px;
+  padding: 8px 16px;
+  color: #333;
+  font-size: 14px;
+  border: 1px solid #e4e7ed;
+  transition: all 0.3s ease;
+}
+
+.issue-tag:hover {
+  background: #e6f7ff;
+  border-color: #91d5ff;
+  color: #1890ff;
+}
+
+/* 自定义滚动条样式 */
+.issues-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.issues-scroll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.issues-scroll::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.issues-scroll::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+.preview-modal {
+  max-width: 900px;
+  max-height: 80vh;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-content {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.preview-content h2 {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 20px;
+  text-align: center;
+}
+
+.examples-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 4px;
+}
+
+.example-item {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.example-item:hover {
+  transform: translateY(-2px);
+}
+
+.example-image {
+  position: relative;
+  padding-top: 100%;
+  background: #f5f7fa;
+}
+
+.example-image img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.example-description {
+  padding: 12px;
+  font-size: 14px;
+  color: #333;
+  text-align: center;
+  background: #fff;
+  border-top: 1px solid #eee;
+}
+
+/* 自定义滚动条样式 */
+.preview-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.preview-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.preview-content::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.preview-content::-webkit-scrollbar-thumb:hover {
+  background: #999;
 }
 </style>
