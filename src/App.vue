@@ -255,11 +255,13 @@ const handleSubmit = () => {
   })
 }
 
+const placeholderImage = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjNjY2Ij7npLrkvos8L3RleHQ+PC9zdmc+'
+
 const imageIssuesData = ref([
   { 
     id: 1, 
     count: 15, 
-    thumbnail: './examples/placeholder.html',
+    thumbnail: placeholderImage,
     issues: [
       '黑白边',
       '水印图片',
@@ -281,7 +283,7 @@ const imageIssuesData = ref([
   { 
     id: 2, 
     count: 12, 
-    thumbnail: './examples/placeholder.html',
+    thumbnail: placeholderImage,
     issues: [
       '水印图片',
       '重复图片',
@@ -300,7 +302,7 @@ const imageIssuesData = ref([
   { 
     id: 3, 
     count: 10, 
-    thumbnail: './examples/placeholder.html',
+    thumbnail: placeholderImage,
     issues: [
       '拼接图片',
       '水印图片',
@@ -317,7 +319,7 @@ const imageIssuesData = ref([
   { 
     id: 4, 
     count: 8, 
-    thumbnail: './examples/placeholder.html',
+    thumbnail: placeholderImage,
     issues: [
       '手机截图',
       '水印图片',
@@ -332,7 +334,7 @@ const imageIssuesData = ref([
   { 
     id: 5, 
     count: 6, 
-    thumbnail: './examples/placeholder.html',
+    thumbnail: placeholderImage,
     issues: [
       '误拍图片',
       '重复图片',
@@ -345,7 +347,7 @@ const imageIssuesData = ref([
   { 
     id: 6, 
     count: 4, 
-    thumbnail: './examples/placeholder.html',
+    thumbnail: placeholderImage,
     issues: [
       '黑白边',
       '变形图片',
@@ -356,7 +358,7 @@ const imageIssuesData = ref([
   { 
     id: 7, 
     count: 3, 
-    thumbnail: './examples/placeholder.html',
+    thumbnail: placeholderImage,
     issues: [
       '拼接图片',
       '变形图片',
@@ -366,7 +368,7 @@ const imageIssuesData = ref([
   { 
     id: 8, 
     count: 2, 
-    thumbnail: './examples/placeholder.html',
+    thumbnail: placeholderImage,
     issues: [
       '手机截图',
       '水印图片'
@@ -375,7 +377,7 @@ const imageIssuesData = ref([
   { 
     id: 9, 
     count: 1, 
-    thumbnail: './examples/placeholder.html',
+    thumbnail: placeholderImage,
     issues: [
       '误拍图片'
     ]
@@ -383,7 +385,7 @@ const imageIssuesData = ref([
   { 
     id: 10, 
     count: 1, 
-    thumbnail: './examples/placeholder.html',
+    thumbnail: placeholderImage,
     issues: [
       '黑白边'
     ]
