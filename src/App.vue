@@ -38,7 +38,7 @@ const imageTypes = ref([
 ]).map(type => ({
   ...type,
   examples: Array(type.count).fill(null).map((_, index) => ({
-    url: [`/image-quality-report-vue2/examples/${type.name.toLowerCase()}-1.jpg`, `/image-quality-report-vue2/examples/${type.name.toLowerCase()}-2.jpg`, `/image-quality-report-vue2/examples/${type.name.toLowerCase()}-3.jpg`][index % 3],
+    url: [`/image-quality-report-vue2/examples/${type.name.toLowerCase()}-1.jpg`, `/image-quality-report-vue2/examples/${type.name.toLowerCase()}-2.jpg`, `/image-quality-report-vue2/examples/${type.name.toLowerCase()}-3.jpg`][index % 3]),
     description: [
       `${type.name}问题-场景1`,
       `${type.name}问题-场景2`,
@@ -259,7 +259,7 @@ const imageIssuesData = ref([
   { 
     id: 1, 
     count: 15, 
-    thumbnail: '/image-quality-report-vue2/examples/placeholder.html', 
+    thumbnail: './examples/placeholder.html',
     issues: [
       '黑白边',
       '水印图片',
@@ -281,7 +281,7 @@ const imageIssuesData = ref([
   { 
     id: 2, 
     count: 12, 
-    thumbnail: '/image-quality-report-vue2/examples/placeholder.html', 
+    thumbnail: './examples/placeholder.html',
     issues: [
       '水印图片',
       '重复图片',
@@ -300,7 +300,7 @@ const imageIssuesData = ref([
   { 
     id: 3, 
     count: 10, 
-    thumbnail: '/image-quality-report-vue2/examples/placeholder.html', 
+    thumbnail: './examples/placeholder.html',
     issues: [
       '拼接图片',
       '水印图片',
@@ -317,7 +317,7 @@ const imageIssuesData = ref([
   { 
     id: 4, 
     count: 8, 
-    thumbnail: '/image-quality-report-vue2/examples/placeholder.html', 
+    thumbnail: './examples/placeholder.html',
     issues: [
       '手机截图',
       '水印图片',
@@ -332,7 +332,7 @@ const imageIssuesData = ref([
   { 
     id: 5, 
     count: 6, 
-    thumbnail: '/image-quality-report-vue2/examples/placeholder.html', 
+    thumbnail: './examples/placeholder.html',
     issues: [
       '误拍图片',
       '重复图片',
@@ -345,7 +345,7 @@ const imageIssuesData = ref([
   { 
     id: 6, 
     count: 4, 
-    thumbnail: '/image-quality-report-vue2/examples/placeholder.html', 
+    thumbnail: './examples/placeholder.html',
     issues: [
       '黑白边',
       '变形图片',
@@ -356,7 +356,7 @@ const imageIssuesData = ref([
   { 
     id: 7, 
     count: 3, 
-    thumbnail: '/image-quality-report-vue2/examples/placeholder.html', 
+    thumbnail: './examples/placeholder.html',
     issues: [
       '拼接图片',
       '变形图片',
@@ -366,7 +366,7 @@ const imageIssuesData = ref([
   { 
     id: 8, 
     count: 2, 
-    thumbnail: '/image-quality-report-vue2/examples/placeholder.html', 
+    thumbnail: './examples/placeholder.html',
     issues: [
       '手机截图',
       '水印图片'
@@ -375,7 +375,7 @@ const imageIssuesData = ref([
   { 
     id: 9, 
     count: 1, 
-    thumbnail: '/image-quality-report-vue2/examples/placeholder.html', 
+    thumbnail: './examples/placeholder.html',
     issues: [
       '误拍图片'
     ]
@@ -383,7 +383,7 @@ const imageIssuesData = ref([
   { 
     id: 10, 
     count: 1, 
-    thumbnail: '/image-quality-report-vue2/examples/placeholder.html', 
+    thumbnail: './examples/placeholder.html',
     issues: [
       '黑白边'
     ]
