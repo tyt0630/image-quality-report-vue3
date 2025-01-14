@@ -35,19 +35,18 @@ const imageTypes = ref([
   { name: '商品质量异常', count: 8, percentage: 3, service: '商品质量异常检测' },
   { name: '角度旋转', count: 8, percentage: 3, service: '角度旋转检测' },
   { name: '过亮或过暗', count: 8, percentage: 3, service: '光线图识别' }
-]).map(type => ({
-  ...type,
-  examples: Array(type.count).fill(null).map((_, index) => ({
-    url: placeholderImage,
-    description: [
-      `${type.name}问题-场景1`,
-      `${type.name}问题-场景2`,
-      `${type.name}问题-场景3`
-    ][index % 3]
-  }))
-}))
+])
 
-const sortedImageTypes = [...imageTypes.value].sort((a, b) => b.percentage - a.percentage)
+const processedImageTypes = computed(() => {
+  return imageTypes.value.map(type => ({
+    ...type,
+    examples: Array(type.count).fill(null).map((_, index) => ({
+      url: placeholderImage
+    }))
+  }));
+});
+
+const sortedImageTypes = [...processedImageTypes.value].sort((a, b) => b.percentage - a.percentage)
 
 // 只获取有问题的图片类型对应的服务
 const services = computed(() => {
@@ -57,26 +56,16 @@ const services = computed(() => {
 })
 
 // 服务列表
-const servicesList = [
-  '黑白边识别',
-  '重复图识别',
-  '水印识别',
-  '拼接图检测',
-  '手机截图识别',
-  '手持误拍识别',
-  '白底图识别',
-  '变形图识别',
-  '卖点贴识别',
-  '包装图检测',
-  '背标图检测',
-  '二维码/条形码检测',
-  '商品质量异常检测',
-  '角度旋转检测',
-  '光线图识别'
-];
+const servicesList = computed(() => {
+  // 根据imageTypes中的数据对服务进行排序
+  return imageTypes.value
+    .sort((a, b) => b.percentage - a.percentage)
+    .map(type => type.service)
+    .filter((service, index, self) => self.indexOf(service) === index);
+});
 
 // 服务能力描述
-const serviceDescriptions = {
+const serviceDescriptions = ref({
   '变形图识别': '主要用于识别酒店图片是否变形',
   '白底图识别': '检测给定图像的背景(非主体部分)是否为纯色白底',
   '拼接图检测': '检测给定的图像是否存在拼接，用于判断图像背景是否因无关信息过多导致画面杂乱',
@@ -92,10 +81,12 @@ const serviceDescriptions = {
   '角度旋转检测': '判断给定图像是否存在角度旋转',
   '光线图识别': '识别图像是否过亮或过暗',
   '水印识别': '检测给定图像中是否含有水印，支持半透明效果水印'
-}
+});
+
+const showServiceDescription = ref('');
 
 const getServiceDescription = (service) => {
-  return serviceDescriptions[service] || service;
+  return serviceDescriptions.value[service] || service;
 };
 
 const openPreview = (type) => {
@@ -276,8 +267,7 @@ const imageIssuesData = ref([
       '二维码条形码',
       '商品质量异常',
       '角度旋转',
-      '过亮或过暗',
-      '模糊'
+      '过亮或过暗'
     ]
   },
   { 
@@ -295,8 +285,7 @@ const imageIssuesData = ref([
       '二维码条形码',
       '商品质量异常',
       '角度旋转',
-      '过亮或过暗',
-      '模糊'
+      '过亮或过暗'
     ]
   },
   { 
@@ -312,8 +301,7 @@ const imageIssuesData = ref([
       '无包装图片',
       '背标图片',
       '二维码条形码',
-      '商品质量异常',
-      '模糊'
+      '商品质量异常'
     ]
   },
   { 
@@ -327,8 +315,7 @@ const imageIssuesData = ref([
       '卖点贴图片',
       '无包装图片',
       '背标图片',
-      '二维码条形码',
-      '模糊'
+      '二维码条形码'
     ]
   },
   { 
@@ -338,7 +325,6 @@ const imageIssuesData = ref([
     issues: [
       '误拍图片',
       '重复图片',
-      '模糊',
       '过亮或过暗',
       '角度旋转',
       '变形图片'
@@ -362,7 +348,7 @@ const imageIssuesData = ref([
     issues: [
       '拼接图片',
       '变形图片',
-      '模糊'
+      '误拍图片'
     ]
   },
   { 
@@ -529,7 +515,7 @@ onMounted(() => {
       onClick: (event, elements) => {
         if (elements.length > 0) {
           const index = elements[0].index;
-          const type = imageTypes.value[index];
+          const type = processedImageTypes.value[index];
           openPreview(type);
         }
       }
@@ -578,7 +564,8 @@ onMounted(() => {
         display: true,
         text: '图片低质问题数量',
         font: {
-          size: 16
+          size: 16,
+          weight: 'normal'
         }
       },
       legend: {
@@ -634,15 +621,15 @@ onMounted(() => {
         </div>
       </div>
       
-      <div class="image-types">
+      <div class="image-types-grid">
         <div 
           v-for="type in sortedImageTypes" 
           :key="type.name" 
-          class="image-type"
+          class="image-type-card"
           @click="openPreview(type)"
         >
-          <div class="type-name">{{ type.name }}</div>
-          <div class="type-count">{{ type.count }}张 ({{ type.percentage }}%)</div>
+          <div class="image-type-name">{{ type.name }}</div>
+          <div class="image-type-count">{{ type.count }}张 ({{ type.percentage }}%)</div>
         </div>
       </div>
 
@@ -669,8 +656,12 @@ onMounted(() => {
              :key="service" 
              :class="['service-tag', { active: selectedServices.includes(service) }]"
              @click="toggleService(service)"
-             :title="getServiceDescription(service)">
+             @mouseover="showServiceDescription = service"
+             @mouseleave="showServiceDescription = ''">
           {{ service }}
+          <div v-if="showServiceDescription === service" class="description-tooltip">
+            {{ getServiceDescription(service) }}
+          </div>
         </div>
       </div>
       <button class="contact-button" style="background-color: #165DFF;" @click="handleCreateScene">生成接入场景</button>
@@ -687,10 +678,7 @@ onMounted(() => {
                  :key="example.url" 
                  class="example-item">
               <div class="example-image">
-                <img :src="example.url" :alt="example.description">
-              </div>
-              <div class="example-description">
-                {{example.description}}
+                <img :src="example.url" :alt="example.url">
               </div>
             </div>
           </div>
@@ -998,70 +986,80 @@ h2 {
   line-height: 1.5;
 }
 
-.image-types {
+.image-types-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
-  padding: 12px;
-  margin: 12px auto;
+  gap: 16px;
+  padding: 20px;
+  margin: 20px auto;
   max-width: 900px;
 }
 
-.image-type {
+.image-type-card {
   background: #f7f8fa;
   border-radius: 6px;
-  padding: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
   min-width: 0;
   text-align: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
-.image-type:hover {
+.image-type-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   background: #ffffff;
 }
 
-.type-name {
-  font-size: 15px;
-  margin-bottom: 4px;
-  color: #333;
+.image-type-name {
+  color: #1D2129;
+  font-size: 16px;
+  font-weight: 500;
 }
 
-.type-count {
-  font-size: 13px;
-  color: #666;
+.image-type-count {
+  color: #86909C;
+  font-size: 14px;
 }
 
 .service-tags {
-  text-align: left;
-  margin-bottom: 30px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(80px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+  padding: 0 20px;
 }
 
 .service-tag {
-  display: inline-block;
-  padding: 8px 16px;
-  margin: 6px;
-  border-radius: 20px;
-  background-color: #f8f9fa;
-  color: #666;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background-color: #F7F8FA;
+  color: #4E5969;
   cursor: pointer;
   transition: all 0.2s;
-  border: 1px solid #eee;
-  position: relative;
+  border: none;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 14px;
+  font-weight: 400;
 }
 
 .service-tag:hover {
-  background-color: #f1f3f5;
-  transform: translateY(-1px);
+  background-color: #F2F3FF;
 }
 
 .service-tag.active {
-  background-color: #e7f5ff;
-  color: #228be6;
-  border-color: #228be6;
+  background-color: #E8F3FF;
+  color: #165DFF;
 }
 
 .service-tooltip {
@@ -1772,5 +1770,42 @@ canvas {
   border-radius: 4px;
   color: #606266;
   font-size: 14px;
+}
+
+.service-tag {
+  position: relative;
+  display: inline-block;
+  padding: 8px 16px;
+  margin: 5px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.service-tag:hover {
+  border-color: #165DFF;
+  color: #165DFF;
+}
+
+.description-tooltip {
+  visibility: hidden;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: nowrap;
+  z-index: 1000;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.service-tag:hover .description-tooltip {
+  visibility: visible;
 }
 </style>
