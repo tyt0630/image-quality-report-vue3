@@ -38,7 +38,7 @@ const imageTypes = ref([
 ]).map(type => ({
   ...type,
   examples: Array(type.count).fill(null).map((_, index) => ({
-    url: [`/image-quality-report-vue2/examples/${type.name.toLowerCase()}-1.jpg`, `/image-quality-report-vue2/examples/${type.name.toLowerCase()}-2.jpg`, `/image-quality-report-vue2/examples/${type.name.toLowerCase()}-3.jpg`][index % 3]),
+    url: placeholderImage,
     description: [
       `${type.name}问题-场景1`,
       `${type.name}问题-场景2`,
@@ -1540,7 +1540,7 @@ canvas {
 }
 
 .issue-tag:hover {
-  background: #e6f7ff;
+  background-color: #e6f7ff;
   border-color: #91d5ff;
   color: #1890ff;
 }
