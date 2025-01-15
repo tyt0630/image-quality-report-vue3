@@ -2,8 +2,9 @@
 import { ref, onMounted, computed } from 'vue'
 import Chart from 'chart.js/auto'
 import { ElMessage, ElTooltip, ElDialog } from 'element-plus'
+import * as XLSX from 'xlsx'
 
-const totalImages = ref(200)
+const totalImages = ref(228)  // 改为228张图片
 const showPreview = ref(false)
 const selectedType = ref(null)
 const selectedServices = ref([])
@@ -121,55 +122,63 @@ const submitForm = () => {
 }
 
 const downloadResults = () => {
+  // 创建工作簿
+  const wb = XLSX.utils.book_new()
+
   // 第一个sheet：统计数据
   const statsHeaders = ['问题类型', '数量', '占比']
-  const statsRows = sortedImageTypes.map(type => [type.name, type.count, `${type.percentage}%`])
-  const statsContent = [
-    statsHeaders.join(','),
-    ...statsRows.map(row => row.join(','))
-  ].join('\n')
+  const statsData = [
+    statsHeaders,
+    ...sortedImageTypes.map(type => [type.name, type.count, `${type.percentage}%`])
+  ]
+  const statsSheet = XLSX.utils.aoa_to_sheet(statsData)
+  XLSX.utils.book_append_sheet(wb, statsSheet, '统计数据')
 
   // 第二个sheet：图片明细
-  // 获取所有可能的问题类型
-  const allIssueTypes = Array.from(new Set(imageIssuesData.value.flatMap(img => img.issues)))
+  // 定义所有问题类型（按照指定顺序）
+  const allIssueTypes = [
+    '黑白边', '重复图片', '水印图片', '拼接图片', '手机截图',
+    '误拍图片', '白底图片', '变形图片', '卖点贴图片', '无包装图片',
+    '背标图片', '二维码条形码', '商品质量异常', '角度旋转', '过亮或过暗'
+  ]
   
-  // 创建表头：图片URL + 所有问题类型
-  const detailHeaders = ['图片URL', ...allIssueTypes.map(type => type)]
+  // 创建表头
+  const detailHeaders = ['图片url']
+  for (let i = 1; i <= 15; i++) {
+    detailHeaders.push(`问题类型${i}`, `结果值${i}`)
+  }
   
-  // 创建行数据
-  const detailRows = imageIssuesData.value.map(image => {
-    const row = [image.thumbnail]
-    // 对每个问题类型，检查图片是否有这个问题
-    allIssueTypes.forEach(type => {
-      row.push(image.issues.includes(type) ? '是' : '否')
+  // 创建行数据并计算每行的问题总数
+  const detailRowsWithScore = []
+  for (let i = 0; i < totalImages.value; i++) {
+    const row = ['123456'] // 使用123456代替图片url
+    const currentImage = imageIssuesData.value[i] || { issues: [] }
+    let issueCount = 0 // 记录这张图片的问题总数
+    
+    allIssueTypes.forEach((type) => {
+      const hasIssue = currentImage.issues.includes(type)
+      row.push(type, hasIssue ? '1' : '0')
+      if (hasIssue) issueCount++
     })
-    return row
-  })
-  
-  const detailContent = [
-    detailHeaders.join(','),
-    ...detailRows.map(row => row.join(','))
-  ].join('\n')
+    
+    detailRowsWithScore.push({
+      row,
+      issueCount
+    })
+  }
 
-  // 合并两个sheet的内容，用两个换行符分隔
-  const csvContent = `${statsContent}\n\n${detailContent}`
+  // 按问题总数倒序排序
+  detailRowsWithScore.sort((a, b) => b.issueCount - a.issueCount)
 
-  // 创建Blob对象
-  const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  
-  // 创建下载链接
-  const link = document.createElement('a')
-  link.href = url
-  link.download = '图片质量诊断结果.csv'
-  
-  // 触发下载
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  
-  // 清理URL对象
-  URL.revokeObjectURL(url)
+  // 提取排序后的行数据
+  const detailRows = detailRowsWithScore.map(item => item.row)
+
+  const detailData = [detailHeaders, ...detailRows]
+  const detailSheet = XLSX.utils.aoa_to_sheet(detailData)
+  XLSX.utils.book_append_sheet(wb, detailSheet, '图片明细')
+
+  // 导出Excel文件
+  XLSX.writeFile(wb, '图片质量诊断结果.xlsx')
 }
 
 const showHelpTooltip = ref(false)
@@ -553,7 +562,7 @@ onMounted(() => {
     labels: ['图片1', '图片2', '图片3', '图片4', '图片5', '图片6', '图片7', '图片8', '图片9', '图片10'],
     datasets: [{
       label: '低质问题数量',
-      data: [15, 12, 10, 8, 6, 4, 3, 2, 1, 1],
+      data: [14, 11, 9, 7, 5, 4, 3, 2, 1, 1],  // 将第三个数据点从10改为9，将第四个数据点从8改为7，将第五个数据点从6改为5
       backgroundColor: 'rgba(135, 206, 250, 0.6)',
       borderWidth: 0
     }]
@@ -641,7 +650,7 @@ onMounted(() => {
       <div class="diagnosis-summary">
         <div class="summary-content">
           <div class="count">本次共诊断了<span class="number">{{ totalImages }}</span>张图片</div>
-          <div class="description">本次调用了手持误拍识别、手机截图识别、拼接图检测、白底图识别、变形图识别、黑白边识别、卖点贴识别、重复图识别、包装图检测、背标图检测、二维码/条形码检测、商品质量异常检测、角度旋转检测、光线图识别、水印识别的服务</div>
+          <div class="description">本次调用了手持误拍识别、手机截图识别、拼接图检测、白底图识别、变形图识别、黑白边识别、卖点贴识别、重复图识别、包装图检测、背标图检测、二维码/条形码检测、商品质量异常检测、角度旋转检测、光线图识别的服务</div>
           <div class="hint">低质图片类型如下所示：</div>
         </div>
       </div>
