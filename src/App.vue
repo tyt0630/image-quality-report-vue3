@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import Chart from 'chart.js/auto'
 import { ElMessage, ElTooltip, ElDialog } from 'element-plus'
-import * as XLSX from 'xlsx'
+import * as XLSX from 'xlsx'; // 修改为正确的导入方式
 
 const totalImages = ref(228)  // 改为228张图片
 const showPreview = ref(false)

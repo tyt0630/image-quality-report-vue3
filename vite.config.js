@@ -11,9 +11,8 @@ export default defineConfig({
     strictPort: true,
     open: true
   },
-  build: {
-    rollupOptions: {
-      external: ['xlsx']
-    }
+  build: {},
+  optimizeDeps: {
+    include: ['xlsx']
   }
 })
