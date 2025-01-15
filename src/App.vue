@@ -650,7 +650,7 @@ onMounted(() => {
       <div class="diagnosis-summary">
         <div class="summary-content">
           <div class="count">本次共诊断了<span class="number">{{ totalImages }}</span>张图片</div>
-          <div class="description">本次调用了手持误拍识别、手机截图识别、拼接图检测、白底图识别、变形图识别、黑白边识别、卖点贴识别、重复图识别、包装图检测、背标图检测、二维码/条形码检测、商品质量异常检测、角度旋转检测、光线图识别的服务</div>
+          <div class="description">本次调用了手持误拍识别、手机截图识别、拼接图检测、白底图识别、变形图识别、黑白边识别、卖点贴识别、重复图识别、包装图检测、背标图检测、二维码/条形码检测、商品质量异常检测、角度旋转检测、光线图识别、水印识别的服务</div>
           <div class="hint">低质图片类型如下所示：</div>
         </div>
       </div>
