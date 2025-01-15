@@ -121,13 +121,38 @@ const submitForm = () => {
 }
 
 const downloadResults = () => {
-  // 生成CSV内容
-  const headers = ['问题类型', '数量', '占比']
-  const rows = sortedImageTypes.map(type => [type.name, type.count, `${type.percentage}%`])
-  const csvContent = [
-    headers.join(','),
-    ...rows.map(row => row.join(','))
+  // 第一个sheet：统计数据
+  const statsHeaders = ['问题类型', '数量', '占比']
+  const statsRows = sortedImageTypes.map(type => [type.name, type.count, `${type.percentage}%`])
+  const statsContent = [
+    statsHeaders.join(','),
+    ...statsRows.map(row => row.join(','))
   ].join('\n')
+
+  // 第二个sheet：图片明细
+  // 获取所有可能的问题类型
+  const allIssueTypes = Array.from(new Set(imageIssuesData.value.flatMap(img => img.issues)))
+  
+  // 创建表头：图片URL + 所有问题类型
+  const detailHeaders = ['图片URL', ...allIssueTypes.map(type => type)]
+  
+  // 创建行数据
+  const detailRows = imageIssuesData.value.map(image => {
+    const row = [image.thumbnail]
+    // 对每个问题类型，检查图片是否有这个问题
+    allIssueTypes.forEach(type => {
+      row.push(image.issues.includes(type) ? '是' : '否')
+    })
+    return row
+  })
+  
+  const detailContent = [
+    detailHeaders.join(','),
+    ...detailRows.map(row => row.join(','))
+  ].join('\n')
+
+  // 合并两个sheet的内容，用两个换行符分隔
+  const csvContent = `${statsContent}\n\n${detailContent}`
 
   // 创建Blob对象
   const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
