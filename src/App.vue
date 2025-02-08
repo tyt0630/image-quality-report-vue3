@@ -294,7 +294,7 @@ const handleSubmit = () => {
   })
 }
 
-const placeholderImage = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjNjY2Ij7npLrkvos8L3RleHQ+PC9zdmc+'
+const placeholderImage = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2Y3ZjhmYSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjNjY2Ij7npLrkvos8L3RleHQ+PC9zdmc+'
 
 const imageIssuesData = ref([
   { 
@@ -571,6 +571,21 @@ onMounted(() => {
     }
   })
 })
+
+// 获取问题最多的前10%图片
+const topProblemImages = computed(() => {
+  const totalCount = totalImages.value
+  const targetCount = Math.ceil(totalCount * 0.1) // 取10%，向上取整
+  
+  // 从示例数据中生成图片列表
+  return imageIssuesData.value
+    .map(item => ({
+      ...item,
+      problemCount: Object.values(item.issues).filter(Boolean).length // 统计每张图片的问题数量
+    }))
+    .sort((a, b) => b.problemCount - a.problemCount) // 按问题数量降序排序
+    .slice(0, targetCount) // 取前10%
+})
 </script>
 
 <template>
@@ -618,6 +633,23 @@ onMounted(() => {
       <div class="chart-section">
         <div class="chart-container quality-distribution">
           <canvas id="qualityChart"></canvas>
+        </div>
+        
+        <!-- 添加缩略图展示区域 -->
+        <div class="thumbnails-section">
+          <h3 style="color: #666666; margin-top: 20px;">问题最多的图片（前10%）</h3>
+          <div class="thumbnails-container">
+            <div v-for="image in topProblemImages" 
+                 :key="image.id" 
+                 class="thumbnail-item"
+                 @click="openIssueDetail(image)">
+              <img :src="image.thumbnail" :alt="'问题图片'" />
+              <div class="thumbnail-info">
+                <div class="problem-title">{{ image.name }}</div>
+                <div class="problem-count">{{ image.problemCount }}个问题</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1764,5 +1796,95 @@ canvas {
 
 .service-tag:hover .description-tooltip {
   visibility: visible;
+}
+
+/* 缩略图区域样式 */
+.thumbnails-section {
+  margin-top: 20px;
+  padding: 15px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.thumbnails-section h3 {
+  margin: 20px 0 15px;
+  font-size: 16px;
+  font-weight: normal;
+  color: #666666;
+}
+
+.thumbnails-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 固定显示4列 */
+  gap: 20px;
+  max-height: 350px;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.thumbnail-item {
+  position: relative;
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  aspect-ratio: 4/3; /* 保持图片比例一致 */
+  max-width: 180px; /* 限制最大宽度 */
+  margin: 0 auto; /* 居中显示 */
+}
+
+.thumbnail-item:hover {
+  transform: translateY(-2px);
+}
+
+.thumbnail-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbnail-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px;
+  background: #e8f3ff;
+  border-top: 1px solid #e4e7ed;
+}
+
+.problem-title {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.problem-count {
+  font-size: 12px;
+  color: #666;
+}
+
+/* 自定义滚动条样式 */
+.thumbnails-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.thumbnails-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.thumbnails-container::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.thumbnails-container::-webkit-scrollbar-thumb:hover {
+  background: #999;
 }
 </style>
