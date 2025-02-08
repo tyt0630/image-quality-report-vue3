@@ -20,6 +20,11 @@ const formData = ref({
   materialType: ''
 })
 
+// 注意：当前为设计示例，展示全部15种可能的问题类型
+// 在实际使用场景下，应该改为动态统计：
+// 1. 只统计和展示本次诊断中实际出现的问题类型
+// 2. 如果一张图片同时出现多个问题（如同时有黑白边和重复图问题），则在每个相关类型中都要计数
+// 3. 这个统计逻辑适用于整个报告的所有部分（柱状图、数据统计、问题列表等）
 const imageTypes = ref([
   { name: '黑白边', count: 32, percentage: 12, service: '黑白边识别' },
   { name: '重复图片', count: 28, percentage: 10, service: '重复图识别' },
@@ -49,6 +54,28 @@ const processedImageTypes = computed(() => {
 
 const sortedImageTypes = [...processedImageTypes.value].sort((a, b) => b.percentage - a.percentage)
 
+// 所有可能的服务列表（固定15种）
+const allServices = [
+  '黑白边识别',
+  '重复图识别',
+  '水印识别',
+  '拼接图检测',
+  '手机截图识别',
+  '手持误拍识别',
+  '白底图识别',
+  '变形图识别',
+  '卖点贴识别',
+  '包装图检测',
+  '背标图检测',
+  '二维码/条形码检测',
+  '商品质量异常检测',
+  '角度旋转检测',
+  '光线图识别'
+]
+
+// 服务列表 - 始终显示所有15种服务
+const servicesList = computed(() => allServices)
+
 // 只获取有问题的图片类型对应的服务
 const services = computed(() => {
   return sortedImageTypes
@@ -56,14 +83,12 @@ const services = computed(() => {
     .map(type => type.service)
 })
 
-// 服务列表
-const servicesList = computed(() => {
-  // 根据imageTypes中的数据对服务进行排序
-  return imageTypes.value
-    .sort((a, b) => b.percentage - a.percentage)
+// 初始化时，根据实际出现的问题类型选中对应服务
+onMounted(() => {
+  selectedServices.value = imageTypes.value
+    .filter(type => type.count > 0)
     .map(type => type.service)
-    .filter((service, index, self) => self.indexOf(service) === index);
-});
+})
 
 // 服务能力描述
 const serviceDescriptions = ref({
@@ -211,17 +236,6 @@ const formItems = [
     type: 'select',
     required: false,
     placeholder: '请输入关联需求'
-  },
-  {
-    label: '素材类型',
-    key: 'materialType',
-    type: 'select',
-    required: true,
-    options: [
-      { label: '图片', value: 'image' },
-      { label: '视频', value: 'video' },
-      { label: '文本', value: 'text' }
-    ]
   },
   {
     label: 'QPS申请量',
@@ -451,7 +465,8 @@ onMounted(() => {
           'rgba(255, 205, 86, 0.5)'  // 黄色 - 光线不足
         ],
         borderWidth: 0,
-        barThickness: 60,
+        barThickness: 35,  // 将柱子宽度调整为35
+        maxBarThickness: 35,  // 最大宽度也设为35
         borderRadius: 0
       }]
     },
@@ -555,73 +570,6 @@ onMounted(() => {
       }
     }
   })
-
-  // 添加图片质量问题分布图表
-  const issuesCtx = document.getElementById('issuesDistributionChart')
-  const chartData = {
-    labels: ['图片1', '图片2', '图片3', '图片4', '图片5', '图片6', '图片7', '图片8', '图片9', '图片10'],
-    datasets: [{
-      label: '低质问题数量',
-      data: [14, 11, 9, 7, 5, 4, 3, 2, 1, 1],  // 将第三个数据点从10改为9，将第四个数据点从8改为7，将第五个数据点从6改为5
-      backgroundColor: 'rgba(135, 206, 250, 0.6)',
-      borderWidth: 0
-    }]
-  }
-
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      y: {
-        beginAtZero: true,
-        max: 15,
-        min: 0,
-        ticks: {
-          stepSize: 3,
-          callback: function(value) {
-            return value + '个'
-          }
-        },
-        grid: {
-          color: 'rgba(0, 0, 0, 0.1)'
-        }
-      },
-      x: {
-        grid: {
-          display: true,
-          color: 'rgba(0, 0, 0, 0.1)'
-        }
-      }
-    },
-    plugins: {
-      title: {
-        display: true,
-        text: '图片低质问题数量',
-        font: {
-          size: 16,
-          weight: 'normal'
-        }
-      },
-      legend: {
-        display: false
-      }
-    }
-  }
-
-  new Chart(issuesCtx, {
-    type: 'bar',
-    data: chartData,
-    options: {
-      ...chartOptions,
-      onClick: (event, elements) => {
-        if (elements.length > 0) {
-          const index = elements[0].index;
-          selectedIssueImage.value = imageIssuesData.value[index];
-          showIssueDetail.value = true;
-        }
-      }
-    }
-  })
 })
 </script>
 
@@ -670,11 +618,6 @@ onMounted(() => {
       <div class="chart-section">
         <div class="chart-container quality-distribution">
           <canvas id="qualityChart"></canvas>
-        </div>
-        
-        <!-- 添加新的图表容器 -->
-        <div class="chart-container issues-distribution">
-          <canvas id="issuesDistributionChart"></canvas>
         </div>
       </div>
     </div>
@@ -759,25 +702,6 @@ onMounted(() => {
             </div>
             <div class="input-container">
               <input v-model="formData.relatedDemand" placeholder="请输入关联需求" type="text">
-            </div>
-          </div>
-
-          <div class="form-item">
-            <div class="form-label">素材类型</div>
-            <div class="input-container">
-              <div class="select-input" @click="toggleDropdown('materialType')" style="text-align: left;">
-                <span v-if="!formData.materialType"></span>
-                <span v-else>{{ formItems.find(item => item.key === 'materialType').options.find(opt => opt.value === formData.materialType)?.label }}</span>
-              </div>
-              <div v-if="activeDropdown === 'materialType'" class="dropdown-content">
-                <div v-for="option in formItems.find(item => item.key === 'materialType').options"
-                     :key="option.value"
-                     class="dropdown-item"
-                     @click="formData.materialType = option.value; activeDropdown = null">
-                  {{ option.label }}
-                  <span v-if="formData.materialType === option.value" class="selected-mark">✓</span>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -1481,8 +1405,7 @@ input:disabled {
   max-width: 800px;  /* 设置最大宽度 */
 }
 
-.quality-distribution,
-.issues-distribution {
+.quality-distribution {
   position: relative;
 }
 
